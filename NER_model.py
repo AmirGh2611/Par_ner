@@ -8,7 +8,7 @@ class Model:
         self.model_name_or_path = "HooshvareLab/distilbert-fa-zwnj-base-ner"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path)
         self.model = AutoModelForTokenClassification.from_pretrained(self.model_name_or_path)
-        self.nlp = pipeline("ner", model=self.model, tokenizer=self.tokenizer)
+        self.nlp = pipeline("ner", model=self.model, tokenizer=self.tokenizer, aggregation_strategy="simple")
 
     def nering(self, text):
         ner_results = self.nlp(text)
