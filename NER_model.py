@@ -41,7 +41,7 @@ class Model:
 
 
 obj = Model()
-result = obj.nering("سلام اسم من امیرحسین")
+result = obj.nering("سلام اسم من امیرحسین و در شرکت هوشیار کار میکنم و مدرک لیسانس خودمو از دانشگاه رجایی گرفتم")
 for i in result:
     b = obj.entity_expand(i["entity_group"])
-    print(i["word"] is b)
+    print(f"{i["word"]}: {b}")
