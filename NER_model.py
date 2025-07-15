@@ -14,6 +14,34 @@ class Model:
         ner_results = self.nlp(text)
         return ner_results
 
+    @staticmethod
+    def entity_expand(a):
+        match a:
+            case "DAT":
+                return "Date"
+            case "EVE":
+                return "Event"
+            case "FAC":
+                return "Facility"
+            case "LOC":
+                return "Location"
+            case "MON":
+                return "Money"
+            case "ORG":
+                return "Organization"
+            case "PCT":
+                return "Percent"
+            case "PER":
+                return "Person"
+            case "PRO":
+                return "Product"
+            case "TIM":
+                return "Time"
+        return None
+
 
 obj = Model()
-print(obj.nering("سلام اسم من امیرحسین"))
+result = obj.nering("سلام اسم من امیرحسین")
+for i in result:
+    b = obj.entity_expand(i["entity_group"])
+    print(i["word"] is b)
