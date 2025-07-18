@@ -1,23 +1,43 @@
-import streamlit as st
-from NER_model import obj
+import gradio as gr
+from NER_model import Model
 
-# رابط کاربری
-st.title("تشخیص موجودیت‌های نام‌دار (NER) در متن فارسی")
+obj = Model()
 
-text = st.text_area("متن خود را وارد کنید:")
 
-if text:
-    results = obj.nering(text)
-    # هایلایت کردن موجودیت‌ها
+def highlight_entities(text):
+    entities = obj.nering(text)
     highlighted_text = text
-    offset = 0  # برای تنظیم جایگزینی درست
 
-    for entity in sorted(results, key=lambda x: x['start']):
-        start = entity['start'] + offset
-        end = entity['end'] + offset
-        label = entity['entity_group']
-        tag = f"<span style='background-color:#D1FFD6; padding:2px 4px; border-radius:4px;'>{text[start:end]} <b>[{label}]</b></span>"
-        highlighted_text = highlighted_text[:start] + tag + highlighted_text[end:]
-        offset += len(tag) - (end - start)
+    # We need to process entities from right to left to maintain correct positions
+    # Since Persian is RTL, we'll sort entities by their start position in descending order
+    entities_sorted = sorted(entities, key=lambda x: x['start'], reverse=True)
 
-    st.markdown(highlighted_text, unsafe_allow_html=True)
+    for entity in entities_sorted:
+        word = entity['word']
+        entity_type = obj.entity_expand(entity['entity_group'])
+        start = entity['start']
+        end = entity['end']
+
+        # Create HTML span with highlighting and tooltip showing entity type
+        highlighted_word = f'<span style="background-color: #6e1435; font-weight: bold;" title="{entity_type}">{word}</span>'
+
+        # Replace the original word with highlighted version
+        highlighted_text = highlighted_text[:start] + highlighted_word + highlighted_text[end:]
+
+    return highlighted_text
+
+
+demo = gr.Interface(
+    fn=highlight_entities,
+    inputs=gr.Textbox(label="متن فارسی را وارد کنید", placeholder="متن فارسی خود را اینجا بنویسید..."),
+    outputs=gr.HTML(label="متن با موجودیت‌های نامدار مشخص شده"),
+    title="تشخیص موجودیت‌های نامدار در متن فارسی",
+    description="این برنامه موجودیت‌های نامدار (مانند نام افراد، مکان‌ها و ...) را در متن فارسی شناسایی و مشخص می‌کند"
+)
+
+# Add RTL direction to the interface
+css = """
+.rtl {direction: rtl; text-align: right;}
+"""
+
+demo.launch(share=True)
