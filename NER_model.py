@@ -38,6 +38,3 @@ class Model:
             case "TIM":
                 return "Time"
         return None
-
-
-obj = Model()
